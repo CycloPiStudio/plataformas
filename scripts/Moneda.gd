@@ -1,5 +1,6 @@
 extends Node2D
-onready var nodolabelpuntos = get_node("/root/Level/HUD/puntuacion")
+onready var nombredelapantalla = get_parent().name
+onready var nodolabelpuntos = get_node("/root/"+nombredelapantalla+"/HUD/puntuacion")
 # class member variables go here, for example:
 # var a = 2
 # var b = "textvar"
