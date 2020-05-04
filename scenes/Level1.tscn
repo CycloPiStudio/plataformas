@@ -7,8 +7,7 @@
 [ext_resource path="res://scenes/Player.tscn" type="PackedScene" id=5]
 [ext_resource path="res://sounds/Sampler_Nivel_1.wav" type="AudioStream" id=6]
 [ext_resource path="res://scenes/Moneda.tscn" type="PackedScene" id=7]
-
-[sub_resource type="DynamicFont" id=1]
+[ext_resource path="res://scenes/HUD.tscn" type="PackedScene" id=8]
 
 [node name="Level" type="Node2D"]
 script = ExtResource( 1 )
@@ -52,18 +51,11 @@ position = Vector2( 1222.97, 100.176 )
 [node name="Player" parent="." instance=ExtResource( 5 )]
 position = Vector2( 37.05, 43.7 )
 
-[node name="HUD" type="CanvasLayer" parent="."]
-
-[node name="puntuacion" type="Label" parent="HUD"]
-margin_right = 1.0
-margin_bottom = 1.0
-custom_fonts/font = SubResource( 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 1 )
-text = "0"
-
 [node name="AudioMusica" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 6 )
 autoplay = true
 
 [node name="Moneda" parent="." instance=ExtResource( 7 )]
 position = Vector2( 175, 101 )
+
+[node name="HUD" parent="." instance=ExtResource( 8 )]
