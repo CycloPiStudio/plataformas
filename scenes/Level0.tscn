@@ -97,7 +97,7 @@ position = Vector2( 676.694, 135.375 )
 position = Vector2( 219.613, 134.477 )
 
 [node name="Enemigo_03" parent="." instance=ExtResource( 8 )]
-position = Vector2( 669.613, -6.52309 )
+position = Vector2( 895.517, 135.894 )
 
 [node name="AudioMusica" type="AudioStreamPlayer2D" parent="."]
 stream = ExtResource( 9 )
