@@ -6,71 +6,64 @@ onready var sprite : AnimatedSprite = $AnimatedSprite
 #onready var animation_player : AnimationPlayer = $AnimationPlayer
 #onready var audio_player : AudioStreamPlayer = $AudioStreamPlayer2D
 export var snap := false
-export var move_speed := 240
+export var move_speed := 200
 export var jump_force := 200
 export var gravity := 300
 export var slope_slide_threshold := 50.0
 #var vidas_personaje = 3
 var velocity := Vector2()
 #var conesion_anima_fin
-
-var left = -0.5
-var right = 0.5
-var direction_x = right
-
+onready var arma = get_node("arma_01")
+onready var lanza_granadas = get_node("lanza_granadas")
 #Cyclo Pi variables
-var bandera_boton_pulsao = false
-onready var gameover = load("res://Menus/GameOver/GameOver.tscn").instance()
+#var bandera_boton_pulsao = false
+#onready var gameover = load("res://Menus/GameOver/GameOver.tscn").instance()
 var bandera_muerto = false
 var bandera_sonido_pasos = true
 
-
 func _physics_process(delta: float) -> void:
-	
-	if bandera_muerto == false:
-		
-	
-#	avance
-		velocity.x = direction_x * move_speed
-	
-	#	game over por límite inferior, esto hay que cambiarlo por game over por areas
-		if position.y > 170:
-#			print(position.y)
-			morir()	
-		
-	#	salto y gravedad	
-		if not is_on_floor():
-			snap = false
-		if Input.is_action_just_pressed("ui_up") and snap:
-			salto()
-	#		audio_player.play()
-	
-	
-		velocity.y += gravity * delta
-	
-		var snap_vector = Vector2(0,32) if snap else Vector2()
-		velocity = move_and_slide_with_snap(velocity,snap_vector, Vector2.UP, slope_slide_threshold)
-	
-	#	if is_on_floor() and (Input.is_action_just_released("move_right") or Input.is_action_just_released("move_left")):
-	#		velocity.y = 0
-		if is_on_wall():
-			if direction_x == left:
-				direction_x = right
-				if Input.is_action_pressed("ui_up") or bandera_boton_pulsao:
-					salto()
-					
-			elif direction_x == right:
-				direction_x = left
+#	print(is_on_floor())
+	var direction_x := Input.get_action_strength("derecha") - Input.get_action_strength("izquierda")
+	velocity.x = direction_x * move_speed
+#	velocity.x = analog_velocity.x* move_speed
+	if Input.is_action_just_pressed("espacio") and snap :
+		salto()
 
-				if Input.is_action_pressed("ui_up") or bandera_boton_pulsao:
-					salto()
-					
-		var acaba_aterizar := is_on_floor() and not snap
-		if acaba_aterizar:
-			snap = true
-			bandera_sonido_pasos = true
+	velocity.y += gravity * delta
+	
+	var snap_vector =  Vector2(0,32) if snap else Vector2()
+	velocity = move_and_slide_with_snap(velocity,snap_vector, Vector2.UP, slope_slide_threshold)
+#	velocity = move_and_slide(velocity,snap_vector)
+#	Vector2(0,32) if snap else Vector2()
+	
+#	if is_on_floor() and (Input.is_action_just_released("derecha") or Input.is_action_just_released("izquierda")):
+#		velocity.y = 0
+
+	var just_landed := is_on_floor() and not snap
+	if just_landed:
+		snap = true
+#	var just_landed =  ($RayCast2D1.is_colliding() and $RayCast2D2.is_colliding()) and not snap
+#	if just_landed:
+#		snap = true
+	if not is_on_floor():
+		snap = false
+	if position.y > 170:
+#	
+		morir()
+#	
+	if Input.is_action_just_pressed("click_izquierdo"):
+		arma.disparo()
+			
+	if Input.is_action_just_pressed("click_derecho"):
+		lanza_granadas.angulo_granada(get_node("AnimatedSprite").is_flipped_h())
+		lanza_granadas.actualizar_direcion()
+		lanza_granadas.lanzar_granada()
 		
-		update_animation(velocity)
+	update_animation(velocity)
+
+	#	game over por límite inferior, esto hay que cambiarlo por game over por areas
+
+		
 
 func update_animation(velocity: Vector2) -> void:
 	var animation := "caminar"
@@ -79,11 +72,12 @@ func update_animation(velocity: Vector2) -> void:
 #		
 		sprite.flip_h = velocity.x < 0
 		animation = "caminar"
-		if bandera_sonido_pasos:
-			bandera_sonido_pasos = false
-			get_node("AudioPasos").play()
-			
-
+		
+		bandera_sonido_pasos = false
+		
+	
+		
+	
 	if not is_on_floor():
 		animation = "saltar" if velocity.y < 0 else "caer"
 		
@@ -91,13 +85,7 @@ func update_animation(velocity: Vector2) -> void:
 		sprite.play(animation)
 
 
-func _on_TextureButton_pressed():
-	bandera_boton_pulsao = false
-	
-func _on_TextureButton_button_down():
-	bandera_boton_pulsao = true
-	if snap :
-		salto()
+
 	
 func salto():
 	snap = false
@@ -108,7 +96,7 @@ func salto():
 func _on_AudioPasos_finished():
 	if snap :
 		bandera_sonido_pasos = true
-	pass # Replace with function body.
+#	pass # Replace with function body.
 	
 func morir():
 	bandera_muerto = true
@@ -130,6 +118,6 @@ func quitar_vida():
 	elif Global.vidas <= 1 :
 		Global.vidas -= 1
 #		Global_cambiar_nivel.wait_frames = 0
-#		Global_cambiar_nivel.goto_scene("res://Menus/GameOver/GameOver.tscn")
-		get_parent().add_child(gameover)
+		Global_cambiar_nivel.goto_scene("res://Menus/GameOver/GameOver.tscn")
+#		get_parent().add_child(gameover)
 #		add_child(gameover)
